@@ -11,11 +11,12 @@
  */
 class Slider {
   constructor({
-    bannerWrapperSelector= '.banner',
+    bannerWrapperSelector = '.banner',
     bannerContentSelector = '#banner-content',
     slideIndicatorsSelector = '#slide-indicators',
     slideControlsSelector = '.slider-controls',
     slideSelector = '.slide',
+    activeSlideSelector = '.slide.active',
     indicatorSelector = '.slide-indicator',
     intervalTime = 4000
   } = {}) {
@@ -24,6 +25,7 @@ class Slider {
     this.slideIndicators = document.querySelector(slideIndicatorsSelector);
     this.sliderControls = document.querySelector(slideControlsSelector);
     this.slides = document.querySelectorAll(slideSelector);
+    this.activeSlideSelector = activeSlideSelector;
     this.indicators = document.querySelectorAll(indicatorSelector);
     this.interval = intervalTime;
     this.intervalID = null;
@@ -31,11 +33,11 @@ class Slider {
     this.threshold = 100;
 
     this.slideIndicators.addEventListener('click', (event) => {
-      if(event.target.type === 'button') this.captionHandler(event)
+      if (event.target.type === 'button') this.captionHandler(event)
     });
 
     this.sliderControls.addEventListener('click', (event) => {
-      if(event.target.type === 'button') this.controlsHandler(event)
+      if (event.target.type === 'button') this.controlsHandler(event)
     });
 
     this.bannerWrapper.addEventListener('touchstart', (event) => {
@@ -44,7 +46,14 @@ class Slider {
 
     this.bannerWrapper.addEventListener('touchend', (event) => {
       this.swipeHandler(event);
+
+      this.dropSlidesStyles();
     });
+
+    this.bannerWrapper.addEventListener('touchmove', (event) => {
+
+    });
+
   }
 
   /**
@@ -94,16 +103,16 @@ class Slider {
     const indicators = Array.from(this.slideIndicators.children)
 
     indicators.forEach((indicator, index, array) => {
-      if(indicator.getAttribute('aria-selected') === 'true') {
+      if (indicator.getAttribute('aria-selected') === 'true') {
         const value = event.target.value;
         const slidesCount = array.length - 1;
 
-        if(value === 'next') newSlideIndex = index === slidesCount ? 0 : index + 1;
-        else if(value === 'prev') newSlideIndex = index === 0 ? slidesCount : index - 1;
+        if (value === 'next') newSlideIndex = index === slidesCount ? 0 : index + 1;
+        else if (value === 'prev') newSlideIndex = index === 0 ? slidesCount : index - 1;
       }
     });
 
-    if(newSlideIndex !== undefined && newSlideIndex !== null && newSlideIndex !== NaN)
+    if (newSlideIndex !== undefined && newSlideIndex !== null && newSlideIndex !== NaN)
       indicators[newSlideIndex]?.click();
   }
 
@@ -112,15 +121,55 @@ class Slider {
    * @param {Event} event - The touchend event.
    */
   swipeHandler(event) {
-      if (this.touchStartX && Math.abs(this.touchStartX - event.changedTouches[0].clientX) > this.threshold) {
-        if (this.touchStartX > event.changedTouches[0].clientX) {
-          this.sliderControls.querySelector('[value="next"]').click();
-        } else {
-          this.sliderControls.querySelector('[value="prev"]').click();
-        }
+    if (this.touchStartX && Math.abs(this.touchStartX - event.changedTouches[0].clientX) > this.threshold) {
+      if (this.touchStartX > event.changedTouches[0].clientX) {
+        this.sliderControls.querySelector('[value="next"]').click();
+      } else {
+        this.sliderControls.querySelector('[value="prev"]').click();
       }
+    }
 
-      this.touchStartX = null;
+    this.touchStartX = null;
+  }
+  /**
+   * Handles the swipe animation of the slide elements. This function will
+   * determine the direction of the swipe and apply the appropriate
+   * CSS animation classes to the active and next slides.
+   *
+   * @param {TouchEvent} event - The touch event triggered by the 'touchmove' event listener.
+   */
+  swipeAnimation(event) {
+    const activeSlide = document.querySelector(this.activeSlideSelector);
+    const currentTouchPositionX = event.touches[0].clientX;
+    const deltaX = currentTouchPositionX - this.touchStartX;
+
+    const activeSlideIndex = Array.from(this.slides).indexOf(activeSlide);
+    let nextSlideIndex;
+
+    // If moving to the right, choose the previous slide, else choose the next slide
+    if (deltaX > 0) {
+      nextSlideIndex = activeSlideIndex === 0 ? this.slides.length - 1 : activeSlideIndex - 1;
+    } else {
+      nextSlideIndex = (activeSlideIndex + 1) % this.slides.length;
+    }
+
+    const nextSlide = this.slides[nextSlideIndex];
+
+    // Determine the swipe direction
+    const swipeDirection = deltaX > 0 ? 'right' : 'left';
+
+    // Remove the existing animation classes
+    activeSlide.classList.remove('swipeInLeft', 'swipeInRight', 'swipeOutLeft', 'swipeOutRight');
+    nextSlide.classList.remove('swipeInLeft', 'swipeInRight', 'swipeOutLeft', 'swipeOutRight');
+
+    // Add the appropriate animation class based on the swipe direction
+    if (swipeDirection === 'right') {
+      activeSlide.classList.add('swipeOutRight');
+      nextSlide.classList.add('swipeInRight');
+    } else {
+      activeSlide.classList.add('swipeOutLeft');
+      nextSlide.classList.add('swipeInLeft');
+    }
   }
 
   /**
@@ -129,18 +178,31 @@ class Slider {
    * @param {number} [index] - The index of the slide and indicator to deactivate.
    */
   dropActiveSlides(index) {
-    if(index) {
+    if (index) {
       this.slides[index].classList.remove("active");
       this.indicators[index].classList.remove("active");
       this.indicators[index].setAttribute('aria-selected', false);
     } else {
-      for(let slide of this.slides) slide.classList.remove('active');
+      for (let slide of this.slides) slide.classList.remove('active');
 
-      for(let indicator of this.indicators) {
+      for (let indicator of this.indicators) {
         indicator.classList.remove('active')
         indicator.setAttribute('aria-selected', false);
       };
     }
+  }
+
+  /**
+   * Removes swipe animation CSS classes from all slide elements after a delay.
+   * This method is used to clean up the CSS classes added during the swipe animation,
+   * allowing for the animations to be applied again when the next swipe occurs.
+   */
+  dropSlidesStyles() {
+    setTimeout(() => {
+      for (let slide of this.slides) {
+        slide.classList.remove('swipeInLeft', 'swipeInRight', 'swipeOutLeft', 'swipeOutRight');
+      }
+    }, 600)
   }
 }
 

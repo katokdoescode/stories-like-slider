@@ -90,7 +90,6 @@
 	background: transparent;
 	border: none;
 	cursor: pointer;
-	border-radius: 2px;
 	display: flex;
 	flex-direction: column;
 	overflow-x: hidden;
@@ -113,6 +112,7 @@
 	height: 4px;
 	width: 20px;
 	background: var(--indicator-color);
+	border-radius: 2px;
 }
 
 .slide-indicator.active {
@@ -142,6 +142,8 @@
 }
 
 .slider-controls .control-button {
+	display: grid;
+	align-items: center;
 	padding: 1em;
 	border-radius: 50%;
 	border: none;
@@ -170,4 +172,40 @@
 	to {
 		background-position: 0 0;
 	}
+}
+
+@keyframes swipeInRight {
+  0% { transform: translateX(100%); opacity: 1; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes swipeInLeft {
+  0% { transform: translateX(-100%); opacity: 1; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes swipeOutRight {
+  0% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(-100%); opacity: 1; }
+}
+
+@keyframes swipeOutLeft {
+  0% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(100%); opacity: 1; }
+}
+
+.swipeInRight {
+  animation: swipeInLeft 0.6s forwards;
+}
+
+.swipeInLeft {
+  animation: swipeInRight 0.6s forwards;
+}
+
+.swipeOutRight {
+  animation: swipeOutLeft 0.6s forwards;
+}
+
+.swipeOutLeft {
+  animation: swipeOutRight 0.6s forwards;
 }
