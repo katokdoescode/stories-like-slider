@@ -11,7 +11,7 @@
 	box-sizing: border-box;
 }
 
-@media (width <= 375px) {
+@media (width <= 430px) {
 	.banner {
 		--banner-height: 392px
 	}
@@ -62,8 +62,8 @@
 	margin: 0;
 }
 
-@media (width <= 375px) {
-	.slide p {
+@media (width <= 430px) {
+	.slide .caption {
 		top: 20px;
 		left: 20px;
 	}
@@ -78,7 +78,7 @@
 	display: flex;
 }
 
-@media (width <= 375px) {
+@media (width <= 430px) {
 	.slide-indicators {
 		padding: 20px;
 	}
@@ -128,6 +128,38 @@
 	animation: slide linear infinite;
 	animation-duration: var(--duration);
 	width: 100%;
+}
+
+.slider-controls {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	padding: 20px;
+	box-sizing: border-box;
+}
+
+.slider-controls .control-button {
+	padding: 1em;
+	border-radius: 50%;
+	border: none;
+	font-size: 1em;
+	font-weight: 800;
+	cursor: pointer;
+	background: transparent;
+	color: transparent;
+}
+
+.slider-controls .control-button:focus-visible,
+.slider-controls .control-button:hover {
+	color: black;
+	background: rgba(255, 255, 255, .1);
+}
+
+.slider-controls .control-button:first-child {
+	transform: rotate(180deg);
 }
 
 @keyframes slide {
