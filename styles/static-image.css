@@ -1,0 +1,13 @@
+.static-image-wrapper {
+	max-width: 438px;
+}
+
+.static-image-wrapper img {
+	border-radius: 30px;
+}
+
+@container banner (max-width: 900px) {
+	.static-image-wrapper {
+		display: none;
+	}
+}

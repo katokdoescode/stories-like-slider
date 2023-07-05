@@ -1,0 +1,12 @@
+@import './styles/slider.css';
+@import './styles/static-image.css';
+
+section {
+	container-type: inline-size;
+  container-name: banner;
+	display: flex;
+	gap: 22px;
+	max-width: 1360px;
+	width: auto;
+	margin: 0 auto;
+}

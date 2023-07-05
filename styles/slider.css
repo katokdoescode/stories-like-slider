@@ -1,0 +1,141 @@
+.banner {
+	--banner-height: 438px;
+
+	container-type: inline-size;
+  container-name: slider;
+	width: 100%;
+	height: var(--banner-height);
+	overflow: hidden;
+	border-radius: 2em;
+	position: relative;
+	box-sizing: border-box;
+}
+
+@media (width <= 375px) {
+	.banner {
+		--banner-height: 392px
+	}
+}
+
+.banner-content {
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+	position: relative;
+}
+
+.slide {
+	top: 0;
+	left: 0;
+	opacity: 0;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	transition: opacity 1s;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+.slide.active {
+	opacity: 1;
+}
+
+.slide img {
+	width: 100%;
+	height: var(--banner-height);
+	object-fit: cover;
+	border-radius: 30px;
+}
+
+.slide .caption {
+	font-family: sans-serif;
+	font-size: clamp(24px, 5vmax, 38px);
+	position: absolute;
+	z-index: 1;
+	top: 40px;
+	left: 40px;
+	max-width: 337px;
+	word-wrap: balance;
+	color: #fff;
+	font-weight: 800;
+	margin: 0;
+}
+
+@media (width <= 375px) {
+	.slide p {
+		top: 20px;
+		left: 20px;
+	}
+}
+
+.slide-indicators {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 137px;
+	padding: 30px 40px;
+	display: flex;
+}
+
+@media (width <= 375px) {
+	.slide-indicators {
+		padding: 20px;
+	}
+}
+
+.slide-indicator {
+	--indicator-color: rgba(255, 255, 255, 0.50);
+	margin: 0 2px;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	border-radius: 2px;
+	display: flex;
+	flex-direction: column;
+	overflow-x: hidden;
+	width: 20px;
+	padding: 0;
+	transition: width 0.2s ease-out;
+	color: transparent;
+	gap: 10px;
+	font-size: 14px;
+	font-style: normal;
+	font-weight: 500;
+	line-height: 16px;
+	text-transform: lowercase;
+}
+
+.slide-indicator::after {
+	transition: width 0.2s ease-out;
+	display: block;
+	content: '';
+	height: 4px;
+	width: 20px;
+	background: var(--indicator-color);
+}
+
+.slide-indicator.active {
+	animation: slide linear infinite;
+	animation-duration: var(--duration);
+	width: fit-content;
+	color: white;
+}
+
+.slide-indicator.active::after {
+	background: linear-gradient(to right, #555 50%, var(--indicator-color) 50%);
+	background-size: 200% 100%;
+	animation: slide linear infinite;
+	animation-duration: var(--duration);
+	width: 100%;
+}
+
+@keyframes slide {
+	from {
+		background-position: 100% 0;
+	}
+
+	to {
+		background-position: 0 0;
+	}
+}

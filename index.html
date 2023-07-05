@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Accessible stories-like slider">
+	<meta name="keywords" content="slider, html5, a11y, native javascript, es6, css3, banner">
+	<meta name="author" content="@katokdoescode">
+	<link rel="stylesheet" href="style.css">
+	<title>Demo: Stories-like slider</title>
+</head>
+
+<body>
+	<section>
+		<div class="banner" style="--duration: 4s" id="slider-banner">
+			<div class="banner-content" id="banner-content">
+				<figure
+					id="slide-1"
+					role="tabpanel"
+					aria-labelledby="tab-1"
+					class="slide slide-0 active"
+				>
+					<picture>
+						<source
+							type="image/webp"
+							srcset="./assets/images/slider-pictures/yellow@lg-x1.webp 1x, ./assets/images/slider-pictures/yellow@lg-x2.webp 2x"
+							media="(min-width: 900px)"
+						/>
+						<source
+							type="image/webp"
+							srcset="./assets/images/slider-pictures/yellow@sm-x1.webp 1x, ./assets/images/slider-pictures/yellow@sm-x2.webp 2x"
+							media="(max-width: 900px)"
+						/>
+						<source
+							srcset="./assets/images/slider-pictures/yellow@lg-x1.jpg 1x, ./assets/images/slider-pictures/yellow@lg-x2.jpg 2x"
+							media="(min-width: 900px)"
+						/>
+						<source
+							srcset="./assets/images/slider-pictures/yellow@sm-x1.jpg 1x, ./assets/images/slider-pictures/yellow@sm-x2.jpg 2x"
+							media="(max-width: 900px)"
+						/>
+						<img
+							src="./assets/images/slider-pictures/yellow@lg-x1.jpg"
+							srcset="./assets/images/slider-pictures/yellow@lg-x2.jpg 2x"
+							alt="Мне врут"
+							width="900"
+							height="438"
+						/>
+					</picture>
+					<figcaption class="caption">Мне врут</figcaption>
+				</figure>
+
+				<figure
+					id="slide-2"
+					role="tabpanel"
+					aria-labelledby="tab-2"
+					class="slide slide-1"
+				>
+					<picture>
+						<source
+							type="image/webp"
+							srcset="./assets/images/slider-pictures/green@lg-x1.webp 1x, ./assets/images/slider-pictures/green@lg-x2.webp 2x"
+							media="(min-width: 900px)"
+						/>
+						<source
+							type="image/webp"
+							srcset="./assets/images/slider-pictures/green@sm-x1.webp 1x, ./assets/images/slider-pictures/green@sm-x2.webp 2x"
+							media="(max-width: 900px)"
+						/>
+						<source
+							srcset="./assets/images/slider-pictures/green@lg-x1.jpg 1x, ./assets/images/slider-pictures/green@lg-x2.jpg 2x"
+							media="(min-width: 900px)"
+						/>
+						<source
+							srcset="./assets/images/slider-pictures/green@sm-x1.jpg 1x, ./assets/images/slider-pictures/green@sm-x2.jpg 2x"
+							media="(max-width: 900px)"
+						/>
+						<img
+							src="./assets/images/slider-pictures/green@lg-x1.jpg"
+							srcset="./assets/images/slider-pictures/green@lg-x2.jpg 2x"
+							alt="Я знаю, мне врут"
+							width="900"
+							height="438"
+						/>
+					</picture>
+					<figcaption class="caption">Я знаю, мне врут</figcaption>
+				</figure>
+
+				<figure
+					id="slide-3"
+					role="tabpanel"
+					aria-labelledby="tab-3"
+					class="slide slide-2"
+				>
+					<picture>
+						<source
+							type="image/webp"
+							srcset="./assets/images/slider-pictures/red@lg-x1.webp 1x, ./assets/images/slider-pictures/red@lg-x2.webp 2x"
+							media="(min-width: 900px)"
+						/>
+						<source
+							type="image/webp"
+							srcset="./assets/images/slider-pictures/red@sm-x1.webp 1x, ./assets/images/slider-pictures/red@sm-x2.webp 2x"
+							media="(max-width: 900px)"
+						/>
+						<source
+							srcset="./assets/images/slider-pictures/red@lg-x1.jpg 1x, ./assets/images/slider-pictures/red@lg-x2.jpg 2x"
+							media="(min-width: 900px)"
+						/>
+						<source
+							srcset="./assets/images/slider-pictures/red@sm-x1.jpg 1x, ./assets/images/slider-pictures/red@sm-x2.jpg 2x"
+							media="(max-width: 900px)"
+						/>
+						<img
+							src="./assets/images/slider-pictures/red@lg-x1.jpg"
+							srcset="./assets/images/slider-pictures/red@lg-x2.jpg 2x"
+							alt="Но всё равно хаваю, что мне суюут"
+							width="900"
+							height="438"
+						/>
+					</picture>
+					<figcaption class="caption">Но всё равно хаваю, что мне суюут</figcaption>
+				</figure>
+			</div>
+
+			<div
+				id="slide-indicators"
+				class="slide-indicators"
+				role="tablist"
+				aria-label="Control tabs"
+				tabindex="0"
+			>
+				<button
+					id="tab-1"
+					role="tab"
+					aria-selected="true"
+					aria-controls="slide-1"
+					class="slide-indicator active"
+					type="button"
+					value="0"
+				>
+					Продавай
+				</button>
+				<button
+					id="tab-2"
+					role="tab"
+					aria-selected="false"
+					aria-controls="slide-2"
+					class="slide-indicator"
+					type="button"
+					value="1"
+				>
+					Покупай
+				</button>
+				<button
+					id="tab-3"
+					role="tab"
+					aria-selected="false"
+					aria-controls="slide-3"
+					class="slide-indicator"
+					type="button"
+					value="2"
+				>
+					Обслуживай
+				</button>
+			</div>
+		</div>
+
+		<div class="static-image-wrapper">
+			<picture>
+				<source
+					type="image/webp"
+					srcset="./assets/images/static-image/qr@x1.webp 1x, ./assets/images/static-image/qr@x2.webp 2x"
+				/>
+				<img
+					src="./assets/images/static-image/qr@x1.jpg"
+					srcset="./assets/images/static-image/qr@x2.jpg x2"
+					alt="QR-code"
+					width="438"
+					height="438"
+				>
+			</picture>
+		</div>
+	</section>
+	<script src="slider.js"></script>
+</body>
+</html>
