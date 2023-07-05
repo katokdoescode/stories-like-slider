@@ -30,7 +30,7 @@ class Slider {
     this.interval = intervalTime;
     this.intervalID = null;
     this.touchStartX = null;
-    this.threshold = 100;
+    this.threshold = 30;
 
     this.slideIndicators.addEventListener('click', (event) => {
       if (event.target.type === 'button') this.captionHandler(event);
@@ -202,7 +202,7 @@ class Slider {
       for (let slide of this.slides) {
         slide.classList.remove('swipeInLeft', 'swipeInRight', 'swipeOutLeft', 'swipeOutRight');
       }
-    }, 600)
+    }, 500)
   }
 }
 
