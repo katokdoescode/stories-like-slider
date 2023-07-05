@@ -33,11 +33,11 @@ class Slider {
     this.threshold = 100;
 
     this.slideIndicators.addEventListener('click', (event) => {
-      if (event.target.type === 'button') this.captionHandler(event)
+      if (event.target.type === 'button') this.captionHandler(event);
     });
 
     this.sliderControls.addEventListener('click', (event) => {
-      if (event.target.type === 'button') this.controlsHandler(event)
+      if (event.target.type === 'button') this.controlsHandler(event);
     });
 
     this.bannerWrapper.addEventListener('touchstart', (event) => {
@@ -51,7 +51,7 @@ class Slider {
     });
 
     this.bannerWrapper.addEventListener('touchmove', (event) => {
-
+      this.swipeAnimation(event);
     });
 
   }
