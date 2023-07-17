@@ -1,22 +1,15 @@
-/**
- * Constructs a Slider object that enables automatic slideshow functionality.
- * @param {Object} obj - An object containing the CSS selectors for various elements used in the slideshow.
- * @param {string} obj.bannerWrapperSelector - The CSS selector for the banner wrapper element.
- * @param {string} obj.bannerContentSelector - The CSS selector for the banner content element.
- * @param {string} obj.slideIndicatorsSelector - The CSS selector for the slide indicator elements.
- * @param {string} obj.slideControlsSelector - The CSS selector for the slide control elements.
- * @param {string} obj.slideSelector - The CSS selector for the slide elements.
- * @param {string} obj.indicatorSelector - The CSS selector for the slide indicator elements.
- * @param {number} obj.intervalTime - The interval between slide transitions in milliseconds.
- */
 class Slider {
+  /**
+   * Constructs a new Slider instance.
+   *
+   * @param {Object} options - Configuration options for the slider.
+   */
   constructor({
     bannerWrapperSelector = '.banner',
     bannerContentSelector = '#banner-content',
     slideIndicatorsSelector = '#slide-indicators',
     slideControlsSelector = '.slider-controls',
     slideSelector = '.slide',
-    activeSlideSelector = '.slide.active',
     indicatorSelector = '.slide-indicator',
     intervalTime = 4000
   } = {}) {
@@ -24,12 +17,9 @@ class Slider {
     this.bannerWrapper = document.querySelector(bannerWrapperSelector);
     this.slideIndicators = document.querySelector(slideIndicatorsSelector);
     this.sliderControls = document.querySelector(slideControlsSelector);
-    this.slides = document.querySelectorAll(slideSelector);
-    this.activeSlideSelector = activeSlideSelector;
-    this.indicators = document.querySelectorAll(indicatorSelector);
+    this.slides = Array.from(document.querySelectorAll(slideSelector));
+    this.indicators = Array.from(document.querySelectorAll(indicatorSelector));
     this.interval = intervalTime;
-    this.intervalID = null;
-    this.touchStartX = null;
     this.threshold = 30;
 
     this.slideIndicators.addEventListener('click', (event) => {
@@ -46,163 +36,106 @@ class Slider {
 
     this.bannerWrapper.addEventListener('touchend', (event) => {
       this.swipeHandler(event);
-
-      this.dropSlidesStyles();
     });
-
-    this.bannerWrapper.addEventListener('touchmove', (event) => {
-      this.swipeAnimation(event);
-    });
-
   }
 
   /**
-   * Begins the slideshow from the specified start index.
-   * @param {number} [startIndex=0] - The index at which the slideshow should start.
+   * Starts the slideshow at the specified index.
+   *
+   * @param {number} startIndex - The start index.
    */
   startSlideshow(startIndex = 0) {
-    this.bannerWrapper.style = `--duration: ${this.interval / 1000}s`;
-
-    if (this.intervalID) clearInterval(this.intervalID);
-
-    let currentIndex = startIndex;
-
-    this.intervalID = setInterval(() => {
-      this.dropActiveSlides(currentIndex);
-
-      currentIndex = (currentIndex + 1) % this.slides.length;
-
-      this.slides[currentIndex].classList.add("active");
-      this.indicators[currentIndex].classList.add("active");
-      this.indicators[currentIndex].setAttribute('aria-selected', true);
-    }, this.interval);
+    this.gotoSlide(startIndex, true);
   }
 
   /**
-   * Handles the event that occurs when a slide indicator button is clicked.
+   * Responds to a click on the slide indicator by going to the slide.
+   *
    * @param {Event} event - The click event.
    */
   captionHandler(event) {
     const button = event.target;
-
-    this.dropActiveSlides();
-
-    this.slides[button.value].classList.add('active')
-    button.classList.add('active');
-    button.setAttribute('aria-selected', true);
-
-    this.startSlideshow(button.value);
+    this.gotoSlide(Number(button.value), true);
   }
 
   /**
-   * Handles the event that occurs when a slide control button is clicked.
+   * Responds to a click on a slide control by going to the next or previous slide.
+   *
    * @param {Event} event - The click event.
    */
   controlsHandler(event) {
-    let newSlideIndex;
-    const indicators = Array.from(this.slideIndicators.children)
+    const currentIndex = this.currentIndex;
 
-    indicators.forEach((indicator, index, array) => {
-      if (indicator.getAttribute('aria-selected') === 'true') {
-        const value = event.target.value;
-        const slidesCount = array.length - 1;
-
-        if (value === 'next') newSlideIndex = index === slidesCount ? 0 : index + 1;
-        else if (value === 'prev') newSlideIndex = index === 0 ? slidesCount : index - 1;
-      }
-    });
-
-    if (newSlideIndex !== undefined && newSlideIndex !== null && newSlideIndex !== NaN)
-      indicators[newSlideIndex]?.click();
+    if (event.target.value === 'next') this.gotoSlide(this.nextIndex(currentIndex), true);
+    else if (event.target.value === 'prev') this.gotoSlide(this.prevIndex(currentIndex), true);
   }
 
   /**
-   * Handles the event that occurs when the user finishes a swipe gesture.
+   * Responds to a swipe by going to the next or previous slide.
+   *
    * @param {Event} event - The touchend event.
    */
   swipeHandler(event) {
     if (this.touchStartX && Math.abs(this.touchStartX - event.changedTouches[0].clientX) > this.threshold) {
-      if (this.touchStartX > event.changedTouches[0].clientX) {
-        this.sliderControls.querySelector('[value="next"]').click();
-      } else {
-        this.sliderControls.querySelector('[value="prev"]').click();
-      }
+      this.touchStartX > event.changedTouches[0].clientX
+        ? this.gotoSlide(this.nextIndex(this.currentIndex), true)
+        : this.gotoSlide(this.prevIndex(this.currentIndex), true);
     }
-
     this.touchStartX = null;
   }
+
   /**
-   * Handles the swipe animation of the slide elements. This function will
-   * determine the direction of the swipe and apply the appropriate
-   * CSS animation classes to the active and next slides.
+   * Goes to the specified slide.
    *
-   * @param {TouchEvent} event - The touch event triggered by the 'touchmove' event listener.
+   * @param {number} index - The slide index.
+   * @param {boolean} restartTimer - Whether to restart the timer.
    */
-  swipeAnimation(event) {
-    const activeSlide = document.querySelector(this.activeSlideSelector);
-    const currentTouchPositionX = event.touches[0].clientX;
-    const deltaX = currentTouchPositionX - this.touchStartX;
-
-    const activeSlideIndex = Array.from(this.slides).indexOf(activeSlide);
-    let nextSlideIndex;
-
-    // If moving to the right, choose the previous slide, else choose the next slide
-    if (deltaX > 0) {
-      nextSlideIndex = activeSlideIndex === 0 ? this.slides.length - 1 : activeSlideIndex - 1;
-    } else {
-      nextSlideIndex = (activeSlideIndex + 1) % this.slides.length;
+  gotoSlide(index, restartTimer = false) {
+    if (this.intervalID) {
+      clearInterval(this.intervalID);
+      this.intervalID = null;
     }
 
-    const nextSlide = this.slides[nextSlideIndex];
+    this.currentIndex = index;
+    this.bannerContent.scrollTo({
+      left: this.slides[0].offsetWidth * index,
+      behavior: 'smooth'
+    });
+    this.updateIndicators(index);
 
-    // Determine the swipe direction
-    const swipeDirection = deltaX > 0 ? 'right' : 'left';
-
-    // Remove the existing animation classes
-    activeSlide.classList.remove('swipeInLeft', 'swipeInRight', 'swipeOutLeft', 'swipeOutRight');
-    nextSlide.classList.remove('swipeInLeft', 'swipeInRight', 'swipeOutLeft', 'swipeOutRight');
-
-    // Add the appropriate animation class based on the swipe direction
-    if (swipeDirection === 'right') {
-      activeSlide.classList.add('swipeOutRight');
-      nextSlide.classList.add('swipeInRight');
-    } else {
-      activeSlide.classList.add('swipeOutLeft');
-      nextSlide.classList.add('swipeInLeft');
+    if (restartTimer) {
+      this.intervalID = setInterval(() => this.gotoSlide(this.nextIndex(this.currentIndex)), this.interval);
     }
   }
 
   /**
-   * Removes the "active" class and 'aria-selected' attribute from all slides and indicators,
-   * or a specific slide and indicator if an index is provided.
-   * @param {number} [index] - The index of the slide and indicator to deactivate.
+   * Updates the slide indicators to reflect the current slide.
+   *
+   * @param {number} activeIndex - The index of the active slide.
    */
-  dropActiveSlides(index) {
-    if (index) {
-      this.slides[index].classList.remove("active");
-      this.indicators[index].classList.remove("active");
-      this.indicators[index].setAttribute('aria-selected', false);
-    } else {
-      for (let slide of this.slides) slide.classList.remove('active');
-
-      for (let indicator of this.indicators) {
-        indicator.classList.remove('active')
-        indicator.setAttribute('aria-selected', false);
-      };
-    }
+  updateIndicators(activeIndex) {
+    this.indicators.forEach((indicator, index) => {
+      indicator.classList.toggle('active', index === activeIndex);
+      indicator.setAttribute('aria-selected', index === activeIndex);
+    });
   }
 
   /**
-   * Removes swipe animation CSS classes from all slide elements after a delay.
-   * This method is used to clean up the CSS classes added during the swipe animation,
-   * allowing for the animations to be applied again when the next swipe occurs.
+   * Returns the index of the next slide.
+   *
+   * @param {number} currentIndex - The index of the current slide.
    */
-  dropSlidesStyles() {
-    setTimeout(() => {
-      for (let slide of this.slides) {
-        slide.classList.remove('swipeInLeft', 'swipeInRight', 'swipeOutLeft', 'swipeOutRight');
-      }
-    }, 500)
+  nextIndex(currentIndex) {
+    return currentIndex === this.slides.length - 1 ? 0 : currentIndex + 1;
+  }
+
+  /**
+   * Returns the index of the previous slide.
+   *
+   * @param {number} currentIndex - The index of the current slide.
+   */
+  prevIndex(currentIndex) {
+    return currentIndex === 0 ? this.slides.length - 1 : currentIndex - 1;
   }
 }
 
