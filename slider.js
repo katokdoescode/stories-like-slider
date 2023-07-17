@@ -104,7 +104,7 @@ class Slider {
     this.updateIndicators(index);
 
     if (restartTimer) {
-      this.intervalID = setInterval(() => this.gotoSlide(this.nextIndex(this.currentIndex)), this.interval);
+      this.intervalID = setInterval(() => this.gotoSlide(this.nextIndex(this.currentIndex), true), this.interval);
     }
   }
 
