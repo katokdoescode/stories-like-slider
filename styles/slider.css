@@ -11,9 +11,10 @@
 	box-sizing: border-box;
 }
 
-@media (width <= 430px) {
+@media (width <= 480px) {
 	.banner {
-		--banner-height: 392px
+		--banner-height: 100%;
+		aspect-ratio: 1 / 1.15;
 	}
 }
 
@@ -42,7 +43,6 @@
 	width: 100%;
 	height: var(--banner-height);
 	object-fit: cover;
-	border-radius: 30px;
 }
 
 .slide .caption {
@@ -141,7 +141,7 @@
 .slider-controls .control-button {
 	display: grid;
 	align-items: center;
-	padding: 1em;
+	padding: 2em;
 	border-radius: 50%;
 	border: none;
 	font-size: 1em;
@@ -151,9 +151,21 @@
 	color: transparent;
 }
 
+.slider-controls .control-button svg {
+	pointer-events: none;
+}
+
+.slider-controls .control-button path {
+	fill: transparent;
+}
+
+.slider-controls .control-button:focus-visible path,
+.slider-controls .control-button:hover path {
+	fill: #fff;
+}
+
 .slider-controls .control-button:focus-visible,
 .slider-controls .control-button:hover {
-	color: black;
 	background: rgba(255, 255, 255, .1);
 }
 
